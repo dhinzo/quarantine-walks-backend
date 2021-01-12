@@ -1,5 +1,7 @@
 const express = require('express')
 
+const HttpError = require('../models/http-error')
+
 const router = express.Router()
 
 const DUMMY_DATA = [
@@ -13,28 +15,6 @@ const DUMMY_DATA = [
         },
         address: '12316 Euclid Ave, Cleveland, OH 44106',
         creator: 'u1'
-    },
-    {
-        id: 'w1',
-        title: 'Lakeview Cemetery',
-        description: 'Where all my friends are',
-        location: {
-            lat: 41.5138354,
-            lng: -81.5983687
-        },
-        address: '12316 Euclid Ave, Cleveland, OH 44106',
-        creator: 'u1'
-    },
-    {
-        id: 'w1',
-        title: 'Lakeview Cemetery',
-        description: 'Where all my friends are',
-        location: {
-            lat: 41.5138354,
-            lng: -81.5983687
-        },
-        address: '12316 Euclid Ave, Cleveland, OH 44106',
-        creator: 'u2'
     }
 ]
 
@@ -44,9 +24,7 @@ router.get('/:wid', (req, res, next) => {
         return w.id === walkId
     })
     if (!walk) {
-        const error = new Error('Could not find a walk for that id...')
-        error.code = 404
-        throw error
+        throw error = new HttpError('Could not find a walk with that id...', 404)        
     }
     res.json({walk})
 })
@@ -57,11 +35,7 @@ router.get('/user/:uid', (req, res, next) => {
         return u.creator === userId
     })
     if (!userWalk) {
-        if (!walk) {
-            const error = new Error('Could not find a walk for that user id...')
-            error.code = 404
-            return next(error)
-        }
+        throw error = new HttpError('Could not find a walk for that user id...', 404)       
     }
     res.json({userWalks})
 })
