@@ -5,6 +5,8 @@ const walkRoutes = require('./routes/walks-routes')
 
 const app = express()
 
+app.use(bodyParser.json())
+
 app.use('/api/walks', walkRoutes)
 
 app.use((error, req, res, next) => {
