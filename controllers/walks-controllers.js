@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require('uuid')
 
 const HttpError = require('../models/http-error')
 
-const DUMMY_DATA = [
+let DUMMY_DATA = [
     {
         id: 'w1',
         title: 'Lakeview Cemetery',
@@ -27,15 +27,15 @@ const getWalkById = (req, res, next) => {
     res.json({walk})
 }
 
-const getWalkByUserId = (req, res, next) => {
+const getWalksByUserId = (req, res, next) => {
     const userId = req.params.uid
-    const userWalk = DUMMY_DATA.find(u => {
+    const userWalks = DUMMY_DATA.filter(u => {
         return u.creator === userId
     })
-    if (!userWalk) {
+    if (!userWalks || userWalks.length === 0) {
         throw error = new HttpError('Could not find a walk for that user id...', 404)       
     }
-    res.json({userWalk})
+    res.json({userWalks})
 }
 
 const createWalk = (req, res, next) => {
@@ -70,12 +70,14 @@ const updateWalk = (req, res, next) => {
 }
 
 const deleteWalk = (req, res, next) => {
-
+    const walkId = req.params.wid
+    DUMMY_DATA = DUMMY_DATA.filter(w => w.id !== walkId)
+    res.status(200).json({ message: 'deleted that walk' })
 }
 
 
 exports.getWalkById = getWalkById
-exports.getWalkByUserId = getWalkByUserId
+exports.getWalksByUserId = getWalksByUserId
 exports.createWalk = createWalk
 exports.updateWalk = updateWalk
 exports.deleteWalk = deleteWalk

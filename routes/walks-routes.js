@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get('/:wid', walksControllers.getWalkById)
 
-router.get('/user/:uid', walksControllers.getWalkByUserId)
+router.get('/user/:uid', walksControllers.getWalksByUserId)
 
 router.post('/', walksControllers.createWalk)
 
