@@ -10,4 +10,8 @@ router.get('/user/:uid', walksControllers.getWalkByUserId)
 
 router.post('/', walksControllers.createWalk)
 
+router.patch('/:wid', walksControllers.updateWalk)
+
+router.delete('/:wid', walksControllers.deleteWalk)
+
 module.exports = router

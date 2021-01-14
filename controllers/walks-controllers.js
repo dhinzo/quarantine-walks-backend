@@ -55,6 +55,27 @@ const createWalk = (req, res, next) => {
     res.status(201).json({ walk: createdWalk})
 }
 
+const updateWalk = (req, res, next) => {
+    const { title, description } = req.body
+    const walkId = req.params.wid
+
+    const updatedWalk = { ...DUMMY_DATA.find(w => w.id === walkId)}
+    const walkIndex = DUMMY_DATA.findIndex(w => w.id === walkId)
+    updatedWalk.title = title
+    updatedWalk.description = description
+
+    DUMMY_DATA[walkIndex] = updatedWalk
+
+    res.status(200).json({walk: updatedWalk})
+}
+
+const deleteWalk = (req, res, next) => {
+
+}
+
+
 exports.getWalkById = getWalkById
 exports.getWalkByUserId = getWalkByUserId
 exports.createWalk = createWalk
+exports.updateWalk = updateWalk
+exports.deleteWalk = deleteWalk
