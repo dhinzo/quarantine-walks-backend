@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
+const { validationResult } = require('express-validator')
 
 const HttpError = require('../models/http-error')
 
@@ -39,6 +40,12 @@ const getWalksByUserId = (req, res, next) => {
 }
 
 const createWalk = (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        console.log(errors)
+        throw new HttpError('Invalid inputs passed. please check and try again')
+    }
+
     const { title, description, coordinates, address, creator } = req.body
     
     const createdWalk = {
@@ -56,6 +63,11 @@ const createWalk = (req, res, next) => {
 }
 
 const updateWalk = (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        throw new HttpError('Invalid inputs passed. please check and try again')
+    }
+
     const { title, description } = req.body
     const walkId = req.params.wid
 

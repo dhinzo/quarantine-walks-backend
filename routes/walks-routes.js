@@ -1,4 +1,5 @@
 const express = require('express')
+const { check } = require('express-validator')
 
 const walksControllers = require('../controllers/walks-controllers')
 
@@ -8,9 +9,27 @@ router.get('/:wid', walksControllers.getWalkById)
 
 router.get('/user/:uid', walksControllers.getWalksByUserId)
 
-router.post('/', walksControllers.createWalk)
+router.post(
+    '/',
+    [ 
+    check('title')
+      .not()
+      .isEmpty(),
+    check('description').isLength({min: 5}),
+    check('address').not().isEmpty()
+    ], 
+    walksControllers.createWalk)
 
-router.patch('/:wid', walksControllers.updateWalk)
+router.patch(
+    '/:wid', 
+    [
+    check('title')
+      .not()
+      .isEmpty(),
+    check('description')
+      .isLength({min: 5})
+    ], 
+    walksControllers.updateWalk)
 
 router.delete('/:wid', walksControllers.deleteWalk)
 
