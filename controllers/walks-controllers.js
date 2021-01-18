@@ -3,6 +3,8 @@ const { validationResult } = require('express-validator')
 
 const getCoordsForAddress = require('../util/location')
 const HttpError = require('../models/http-error')
+const Walk = require('../models/walk')
+
 
 let DUMMY_DATA = [
     {
@@ -43,7 +45,6 @@ const getWalksByUserId = (req, res, next) => {
 const createWalk = async (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        console.log(errors)
         return next(new HttpError('Invalid inputs passed. please check and try again', 422))
     }
 
@@ -56,16 +57,20 @@ const createWalk = async (req, res, next) => {
         return next(error)
     }
     
-    const createdWalk = {
-        id: uuidv4(),
-        title: title,
-        description: description,
-        location: coordinates,
-        address: address,
-        creator: creator
+    const createdWalk = new Walk({
+        title, 
+        description, 
+        address, 
+        location: coordinates, 
+        image: 'https://observer.case.edu/wp-content/uploads/2012/10/Ne_lakeview-BW.jpg', creator  
+    })
+   
+   try {
+        await createdWalk.save()
+    } catch (err) {
+        const error = new HttpError('Creating this walk failed, please try again', 500)
+        return next(error)
     }
-    
-    DUMMY_DATA.push(createdWalk)
     
     res.status(201).json({ walk: createdWalk})
 }

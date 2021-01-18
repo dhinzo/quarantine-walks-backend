@@ -19,7 +19,7 @@ const getUsers = (req, res, next) => {
 const signup = (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        console.log(errors)
+        
         throw new HttpError('Invalid login information. Try again')
     }
 

@@ -1,5 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
 
 const walkRoutes = require('./routes/walks-routes')
 const usersRoutes = require('./routes/users-routes')
@@ -26,6 +28,20 @@ app.use((error, req, res, next) => {
     res.json({message: error.message || 'An unknown error occurred...'})
 })
 
-app.listen(5000, () => {
-    console.log('Listening for requests...')
-})
+
+const mongodbURI = process.env.MONGODBURI
+
+mongoose.connect(mongodbURI, {
+    useFindAndModify: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,  
+  })
+  .then(() => {
+    app.listen(5000, () => {
+        console.log("listening...")
+    })
+  })
+  .catch(err => {
+      console.log(err)
+  })
+
