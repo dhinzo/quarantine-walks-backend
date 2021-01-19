@@ -20,26 +20,51 @@ let DUMMY_DATA = [
     }
 ]
 
-const getWalkById = (req, res, next) => {
+const getWalkById = async (req, res, next) => {
     const walkId = req.params.wid
-    const walk = DUMMY_DATA.find(w => {
-        return w.id === walkId
-    })
-    if (!walk) {
-        throw error = new HttpError('Could not find a walk with that id...', 404)        
+
+    let walk
+    try {
+        walk = await Walk.findById(walkId)
+    } catch (err) {
+        const error = new HttpError("Something went wrong... couldn't find that walk.", 500)
+        return next(error)
     }
-    res.json({walk})
+        
+    if (!walk) {
+        const error = new HttpError('Could not find a walk with that id...', 404)
+        return next(error)        
+    }
+    res.json({ walk: walk.toObject( { getters: true }) })
 }
 
-const getWalksByUserId = (req, res, next) => {
+const getWalksByUserId = async (req, res, next) => {
     const userId = req.params.uid
-    const userWalks = DUMMY_DATA.filter(u => {
-        return u.creator === userId
-    })
-    if (!userWalks || userWalks.length === 0) {
-        throw error = new HttpError('Could not find a walk for that user id...', 404)       
+    
+    // instantiate variable for function
+    let userWalks
+
+    try  {
+        // .find({ property: variable })
+        userWalks = await Walk.find({ creator: userId })
+    } catch (err) {
+        const error = new HttpError(
+            "Something's not right... try again", 
+            500
+        )
+        return next(error)
     }
-    res.json({userWalks})
+
+    if (!userWalks || userWalks.length === 0) {
+        return next(new HttpError(
+            'Could not find a walk for that user id...', 
+            404)
+        )       
+    }
+    // .find() returns an array, so use .map() to make each userWalk an object
+    res.json({ userWalks: userWalks.map(walk => walk.toObject({ 
+    //getters: true removes the underscore in _id
+    getters: true }) )})
 }
 
 const createWalk = async (req, res, next) => {
@@ -70,8 +95,7 @@ const createWalk = async (req, res, next) => {
     } catch (err) {
         const error = new HttpError('Creating this walk failed, please try again', 500)
         return next(error)
-    }
-    
+    }    
     res.status(201).json({ walk: createdWalk})
 }
 
