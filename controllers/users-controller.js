@@ -2,6 +2,8 @@ const { validationResult } = require('express-validator')
 const { v4: uuidv4 } = require('uuid')
 
 const HttpError = require('../models/http-error')
+const User = require('../models/user')
+
 
 const DUMMY_USERS = [
     {
@@ -16,39 +18,73 @@ const getUsers = (req, res, next) => {
     res.json({ users: DUMMY_USERS })
 }
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
     const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        
-        throw new HttpError('Invalid login information. Try again')
+    if (!errors.isEmpty()) {        
+        return next(new HttpError('Invalid login information. Try again', 422))
     }
 
-    const {name, email, password} = req.body
+    const {name, email, password, walks} = req.body
 
-    const checkUser = DUMMY_USERS.find(u => u.email === email)
-    if (checkUser) {
-        throw new HttpError('account already exists. please try a different email', 422) 
+    let existingUser
+    try {
+        existingUser = await User.findOne({ email: email })
+    } catch (err) {
+        const error = new HttpError(
+            'Sign up failed. Try again later!',
+            500
+        )
+        return next(error)
     }
 
-    const createdUser = {
-        id: uuidv4(),
+    if (existingUser) {
+        const error = new HttpError(
+            'That email is already registered. Please login.',
+            422
+        )
+        return next(error)
+    }
+
+    const createdUser = new User({
         name,
         email,
-        password
-    }
+        image: 'https://i.imgur.com/b9fZUhA.jpg',
+        password,
+        walks 
+    })
 
-    DUMMY_USERS.push(createdUser)
-
-    res.status(201).json({ user: createdUser})
+    try {
+        await createdUser.save()
+    } catch (err) {
+        const error = new HttpError('Creating this user failed, please try again', 500)
+        return next(error)
+    }    
+    res.status(201).json({ user: createdUser.toObject({ getters: true }) })
 }
 
-const login = (req, res, next) => {
+
+const login = async (req, res, next) => {
     const { email, password } = req.body
-    
-    const foundUser = DUMMY_USERS.find(u => u.email === email)
-    if (!foundUser || foundUser.password !== password) {
-        throw new HttpError('could not find this account. check your info and try again', 401)
+
+    let existingUser
+    try {
+        existingUser = await User.findOne({ email: email })
+    } catch (err) {
+        const error = new HttpError(
+            'Login failed. Try again!',
+            500
+        )
+        return next(error)
     }
+
+    if (!existingUser || existingUser.password !== password) {
+        const error = new HttpError(
+            "You entered some invalid credentials... please try again.",
+            401
+        )
+        return next(error)
+    }
+    
     res.json({message: 'logged in'})
 }
 

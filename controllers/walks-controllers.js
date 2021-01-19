@@ -102,7 +102,7 @@ const createWalk = async (req, res, next) => {
 const updateWalk = async (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        throw new HttpError('Invalid inputs passed. please check and try again')
+        return next(new HttpError('Invalid inputs passed. please check and try again', 422))
     }
 
     const { title, description } = req.body
