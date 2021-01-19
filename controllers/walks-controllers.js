@@ -99,7 +99,7 @@ const createWalk = async (req, res, next) => {
     res.status(201).json({ walk: createdWalk})
 }
 
-const updateWalk = (req, res, next) => {
+const updateWalk = async (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         throw new HttpError('Invalid inputs passed. please check and try again')
@@ -108,19 +108,57 @@ const updateWalk = (req, res, next) => {
     const { title, description } = req.body
     const walkId = req.params.wid
 
-    const updatedWalk = { ...DUMMY_DATA.find(w => w.id === walkId)}
-    const walkIndex = DUMMY_DATA.findIndex(w => w.id === walkId)
-    updatedWalk.title = title
-    updatedWalk.description = description
+    let walk
+    try {
+        walk = await Walk.findById(walkId)
+    } catch (err) {
+        const error = new HttpError(
+            'Error updating...',
+            500
+        )
+        return next(error)
+    }
 
-    DUMMY_DATA[walkIndex] = updatedWalk
+    walk.title = title
+    walk.description = description
 
-    res.status(200).json({walk: updatedWalk})
+    try {
+        await walk.save()
+    } catch (err) {
+        const error = new HttpError(
+            "Something went wrong updating this walk",
+            500
+        )
+        return next(error)
+    }
+
+    res.status(200).json({walk: walk.toObject({ getters: true }) })
 }
 
-const deleteWalk = (req, res, next) => {
+const deleteWalk = async (req, res, next) => {
     const walkId = req.params.wid
-    DUMMY_DATA = DUMMY_DATA.filter(w => w.id !== walkId)
+    
+    let walk
+    try {
+        walk = await Walk.findById(walkId)
+    } catch (err) {
+        const error = new HttpError(
+            "Error deleting...",
+           500 
+        )
+        return next(error)
+    }
+
+    try{
+        await walk.remove()
+    }catch (err) {
+        const error = new HttpError(
+            "Error deleting...",
+           500 
+        )
+        return next(error)
+    }
+
     res.status(200).json({ message: 'deleted that walk' })
 }
 
