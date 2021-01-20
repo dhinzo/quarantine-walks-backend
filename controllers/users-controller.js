@@ -1,18 +1,8 @@
 const { validationResult } = require('express-validator')
-const { v4: uuidv4 } = require('uuid')
 
 const HttpError = require('../models/http-error')
 const User = require('../models/user')
 
-
-const DUMMY_USERS = [
-    {
-        id: 'u1',
-        name: 'Devin',
-        email: 'test@test.com',
-        password: '1234'
-    }
-]
 
 const getUsers = async (req, res, next) => {
     let users
@@ -34,7 +24,7 @@ const signup = async (req, res, next) => {
         return next(new HttpError('Invalid login information. Try again', 422))
     }
 
-    const {name, email, password, walks} = req.body
+    const { name, email, password } = req.body
 
     let existingUser
     try {
@@ -60,7 +50,7 @@ const signup = async (req, res, next) => {
         email,
         image: 'https://i.imgur.com/b9fZUhA.jpg',
         password,
-        walks 
+        walks: [] 
     })
 
     try {
