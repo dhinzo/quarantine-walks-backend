@@ -21,7 +21,7 @@ const getUsers = async (req, res, next) => {
 const signup = async (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {        
-        return next(new HttpError('Invalid login information. Try again', 422))
+        return next(new HttpError('That email is already registered. Please login.', 422))
     }
 
     const { name, email, password } = req.body
@@ -70,6 +70,7 @@ const login = async (req, res, next) => {
     try {
         existingUser = await User.findOne({ email: email })
     } catch (err) {
+        console.log("here is the login route catch")
         const error = new HttpError(
             'Login failed. Try again!',
             500
