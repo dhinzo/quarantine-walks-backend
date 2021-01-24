@@ -1,4 +1,5 @@
-const { v4: uuidv4 } = require('uuid')
+const fs = require('fs')
+
 const { validationResult } = require('express-validator')
 const mongoose = require('mongoose')
 
@@ -77,7 +78,7 @@ const createWalk = async (req, res, next) => {
         description, 
         address, 
         location: coordinates, 
-        image: 'https://observer.case.edu/wp-content/uploads/2012/10/Ne_lakeview-BW.jpg', 
+        image: req.file.path, 
         creator  
     })
    
@@ -174,6 +175,8 @@ const deleteWalk = async (req, res, next) => {
         return next(error)
     }
 
+    const imagePath = walk.image
+
     try{
         const sesh = await mongoose.startSession()
         sesh.startTransaction()
@@ -188,6 +191,10 @@ const deleteWalk = async (req, res, next) => {
         )
         return next(error)
     }
+
+    fs.unlink(imagePath, err => {
+        console.log(err)
+    })
 
     res.status(200).json({ message: 'deleted that walk' })
 }
