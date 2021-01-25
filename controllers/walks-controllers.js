@@ -137,6 +137,11 @@ const updateWalk = async (req, res, next) => {
         return next(error)
     }
 
+    if (walk.creator.toString() !== req.userData.userId) {
+        const error = new HttpError('You are not allowed to edit this', 401)
+        return next(error)
+    }
+
     walk.title = title
     walk.description = description
 
