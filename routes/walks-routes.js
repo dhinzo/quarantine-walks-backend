@@ -3,12 +3,16 @@ const { check } = require('express-validator')
 
 const walksControllers = require('../controllers/walks-controllers')
 const fileUpload = require('../middleware/file-upload')
+const checkAuth = require('../middleware/check-auth')
 
 const router = express.Router()
 
 router.get('/:wid', walksControllers.getWalkById)
 
 router.get('/user/:uid', walksControllers.getWalksByUserId)
+
+// this middleware will protect the below routes
+router.use(checkAuth)
 
 router.post(
     '/',
