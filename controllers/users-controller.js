@@ -77,7 +77,7 @@ const signup = async (req, res, next) => {
         // assigning token to specific user via userId
         token = jwt.sign({ 
             userId: createdUser.id, email: createdUser.email }, 
-            'Q_Secret',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
             )
     } catch (err) {
@@ -131,7 +131,7 @@ const login = async (req, res, next) => {
     if (!isValidPassword) {
         const error = new HttpError(
             "You entered some invalid credentials... please try again.",
-            401
+            403
         )
         return next(error)
     }
@@ -141,7 +141,7 @@ const login = async (req, res, next) => {
         // assigning token to specific user via userId
         token = jwt.sign({ 
             userId: existingUser.id, email: existingUser.email }, 
-            'Q_Secret',
+            process.env.JWT_KEY,
             { expiresIn: '1h' }
             )
     } catch (err) {

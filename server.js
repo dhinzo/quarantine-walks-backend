@@ -1,4 +1,3 @@
-require('dotenv').config()
 
 const fs = require('fs')
 const path = require('path')
@@ -51,9 +50,9 @@ app.use((error, req, res, next) => {
 })
 
 
-const mongodbURI = process.env.MONGODBURI
 
-mongoose.connect(mongodbURI, {
+
+mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PW}@qwalks.gzp5j.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
     useFindAndModify: false,
     useNewUrlParser: true,
     useUnifiedTopology: true,  
