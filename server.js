@@ -58,7 +58,7 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PW}@qwal
     useUnifiedTopology: true,  
   })
   .then(() => {
-    app.listen(5000, () => {
+    app.listen(process.env.PORT || 5000, () => {
         console.log("listening...")
     })
   })
