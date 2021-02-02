@@ -14,12 +14,6 @@ const HttpError = require('./models/http-error')
 
 const app = express()
 
-const s3 = new AWS.S3({
-    accessKeyId: process.env.BUCKETEER_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.BUCKETEER_AWS_SECRET_ACCESS_KEY,
-    region: 'us-east-1',  
-})
-
 app.use(bodyParser.json())
 
 //image route
@@ -35,32 +29,6 @@ app.use((req, res, next) => {
 })
 
 
-// storeimages to the BUCKETEER bucket
-var params = {
-    Bucket: process.env.BUCKETEER_BUCKET_NAME,
-    Key:    'hello',
-    Body:   new Buffer.from('Hello, node.js'),
-  };
-  
-  s3.putObject(params, function put(err, data) {
-    if (err) {
-      console.log(err, err.stack);
-      return;
-    } else {
-      console.log(data);
-    }
-  
-    delete params.Body;
-    s3.getObject(params, function put(err, data) {
-      if (err) console.log(err, err.stack);
-      else     console.log(data);
-  
-      console.log(data.Body.toString());
-    });
-  });
-
-
-
 app.use('/api/walks', walkRoutes)
 app.use('/api/users', usersRoutes)
 
@@ -73,7 +41,9 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
     if (req.file) {
         //deletes file
-        fs.unlink(req.file.path, (err) => {
+        console.log("here is the req.file in error route", req.file)
+        fs.unlink(req.file.location, (err) => {
+            console.log("here is the req.file.location in error route", req.file.location)
             console.log(err)
         })
     }
@@ -83,8 +53,6 @@ app.use((error, req, res, next) => {
     res.status(error.code || 500)
     res.json({message: error.message || 'An unknown error occurred...'})
 })
-
-
 
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PW}@qwalks.gzp5j.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`, {

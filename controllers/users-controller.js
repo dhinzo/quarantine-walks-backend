@@ -60,7 +60,7 @@ const signup = async (req, res, next) => {
     const createdUser = new User({
         name,
         email,
-        image: req.file.path,
+        image: req.file.location,
         password: hashedPassword,
         walks: [] 
     })
@@ -99,7 +99,6 @@ const login = async (req, res, next) => {
     try {
         existingUser = await User.findOne({ email: email })
     } catch (err) {
-        console.log("here is the login route catch")
         const error = new HttpError(
             'Login failed. Try again!',
             500
